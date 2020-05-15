@@ -384,10 +384,10 @@ class SecondInfoBar(Screen):
 		self["FullDescription"].pageDown()
 
 	def __Show(self):
-		if config.plisettings.ColouredButtons.value:
-			self["key_yellow"].setText(_("Search"))
-		self["key_red"].setText(_("Similar"))
-		self["key_blue"].setText(_("Extensions"))
+		if config.obhsettings.ColouredButtons.value:	
+		               self["key_yellow"].setText(_("Audio Panel"))	
+		self["key_red"].setText(_(" "))	
+		self["key_blue"].setText(_("Blue Panel"))
 		self["SecondInfoBar"].doBind()
 		self.getEvent()
 
@@ -425,7 +425,7 @@ class SecondInfoBar(Screen):
 			if self.isRecording:
 				self["key_green"].setText("")
 			else:
-				self["key_green"].setText(_("Add timer"))
+				self["key_green"].setText(_("Green Panel"))
 			self.setEvent(self.event)
 
 	def getNowNext(self):
@@ -3118,11 +3118,10 @@ class InfoBarExtensions:
 	def __init__(self):
 		self.list = []
 
-		if config.plisettings.ColouredButtons.value:
+		if config.obhsettings.ColouredButtons.value:
 			self["InstantExtensionsActions"] = HelpableActionMap(self, "InfobarExtensions",
 				{
 					"extensions": (self.bluekey_ex, _("Show extensions...")),
-					"quickmenu": (self.bluekey_qm, _("Show quickmenu...")),
 					"showPluginBrowser": (self.showPluginBrowser, _("Show the plugin browser..")),
 					"showEventInfo": (self.SelectopenEventView, _("Show the information on current event.")),
 					"openTimerList": (self.showTimerList, _("Show the list of timers.")),
@@ -3136,7 +3135,6 @@ class InfoBarExtensions:
 			self["InstantExtensionsActions"] = HelpableActionMap(self, "InfobarExtensions",
 				{
 					"extensions": (self.bluekey_ex, _("view extensions...")),
-					"quickmenu": (self.bluekey_qm, _("Show quickmenu...")),
 					"showPluginBrowser": (self.showPluginBrowser, _("Show the plugin browser..")),
 					"showDreamPlex": (self.showDreamPlex, _("Show the DreamPlex player...")),
 					"showEventInfo": (self.SelectopenEventView, _("Show the information on current event.")),
@@ -3154,51 +3152,12 @@ class InfoBarExtensions:
 		for p in plugins.getPlugins(PluginDescriptor.WHERE_EXTENSIONSINGLE):
 			p(self)
 
-	def bluekey_qm(self):
-		if config.workaround.blueswitch.value == "1":
-			self.showExtensionSelection()
-		else:
-			self.quickmenuStart()
-
-	def bluekey_ex(self):
-		if config.workaround.blueswitch.value == "1":
-			self.quickmenuStart()
-		else:
-			self.showExtensionSelection()
-
-	def quickmenuStart(self):
-		try:
-			if not self.session.pipshown:
-				from Plugins.Extensions.Infopanel.QuickMenu import QuickMenu
-				self.session.open(QuickMenu)
-			else:
-				self.showExtensionSelection()
-		except:
-			print "[INFOBARGENERICS] QuickMenu: error pipshow, starting Quick Menu"
-			from Plugins.Extensions.Infopanel.QuickMenu import QuickMenu
-			self.session.open(QuickMenu)
-
-	def SelectopenEventView(self):
-		try:
-			self.openEventView()
-		except:
-			pass
-
 	def getLMname(self):
 		return _("Log Manager")
 
 	def getLogManager(self):
 		if config.logmanager.showinextensions.value:
 			return [((boundFunction(self.getLMname), boundFunction(self.openLogManager), lambda: True), None)]
-		else:
-			return []
-
-	def getSoftcamPanelname(self):
-		return _("Softcam-Panel")
-
-	def getSoftcamPanel(self):
-		if config.plugins.showinfopanelextensions.value:
-			return [((boundFunction(self.getSoftcamPanelname), boundFunction(self.openSoftcamPanel), lambda: True), None)]
 		else:
 			return []
 
@@ -3307,8 +3266,11 @@ class InfoBarExtensions:
 			answer[1][1]()
 
 	def showPluginBrowser(self):
-		from Screens.PluginBrowser import PluginBrowser
-		self.session.open(PluginBrowser)
+# In Bh image blue press = blue panel	
+#		from Screens.PluginBrowser import PluginBrowser	
+#		self.session.open(PluginBrowser)	
+		from Screens.BpBlue import DeliteBluePanel	
+		self.session.open(DeliteBluePanel)
 
 	def openCCcamInfo(self):
 		from Screens.CCcamInfo import CCcamInfoMain
@@ -3328,10 +3290,6 @@ class InfoBarExtensions:
 	def open3DSetup(self):
 		from Screens.UserInterfacePositioner import OSD3DSetupScreen
 		self.session.open(OSD3DSetupScreen)
-
-	def openSoftcamPanel(self):
-		from Plugins.Extensions.Infopanel.SoftcamPanel import SoftcamPanel
-		self.session.open(SoftcamPanel)
 
 	def openRestartNetwork(self):
 		try:
@@ -3684,131 +3642,6 @@ class InfoBarPiP:
 		elif "stop" == use:
 			self.showPiP()
 
-class InfoBarINFOpanel:
-	"""INFO-Panel - handles the infoPanel action"""
-	def __init__(self):
-		self["INFOpanelActions"] = HelpableActionMap(self, "InfoBarINFOpanel",
-			{
-				"infoPanel": (self.selectRedKeytask, _("INFO-Panel...")),
-				"softcamPanel": (self.softcamPanel, _("Softcam-Panel...")),
-			})
-		self.onHBBTVActivation = [ ]
-		self.onRedButtonActivation = [ ]
-
-	def selectRedKeytask(self):
-		isWEBBROWSER = None
-		isHBBTV = None
-		if os.path.isfile("/usr/lib/enigma2/python/Plugins/Extensions/WebBrowser/browser.pyo"):
-			isWEBBROWSER = True
-		if os.path.isfile("/usr/lib/enigma2/python/Plugins/Extensions/HbbTV/plugin.pyo"):
-			isHBBTV = True
-		if os.path.isfile("/usr/lib/enigma2/python/Plugins/Extensions/E3Opera/plugin.pyo"):
-			isHBBTV = True
-		if os.path.isfile("/usr/lib/enigma2/python/Plugins/Extensions/NXHbbTV/plugin.pyo"):
-			isHBBTV = True
-		if os.path.isfile("/usr/lib/enigma2/python/Plugins/Extensions/OpenOpera/plugin.pyo"):
-			isHBBTV = True
-		if os.path.isfile("/usr/lib/enigma2/python/Plugins/Extensions/WebkitHbbTV/plugin.pyo"):
-			isHBBTV = True
-		if os.path.isfile("/usr/lib/enigma2/python/Plugins/Extensions/QtHbbtv/plugin.pyo"):
-			isHBBTV = True
-		if os.path.isfile("/usr/lib/enigma2/python/Plugins/Extensions/Hbbtv/plugin.pyo"):
-			isHBBTV = True
-
-		if isWEBBROWSER or isHBBTV:
-			service = self.session.nav.getCurrentService()
-			info = service and service.info()
-			if info and info.getInfoString(iServiceInformation.sHBBTVUrl) != "":
-				for x in self.onHBBTVActivation:
-					x()
-					
-			elif config.plugins.infopanel_redpanel.selection.value == '0':
-				self.instantRecord()
-			else:
-				self.doRedKeyTask()
-		
-		elif config.plugins.infopanel_redpanel.selection.value == '0':
-			self.instantRecord()
-		else:
-			self.doRedKeyTask()
-
-	def doRedKeyTask(self):
-		try:
-			if config.plugins.infopanel_redpanel.selection.value =='0':
-				self.instantRecord()
-			elif config.plugins.infopanel_redpanel.selection.value =='1':
-				from Plugins.Extensions.Infopanel.plugin import Infopanel
-				self.session.open(Infopanel, services = self.servicelist)
-			elif config.plugins.infopanel_redpanel.selection.value == '2':
-				self.session.open(TimerEditList)
-			elif config.plugins.infopanel_redpanel.selection.value == '3':
-				self.showMovies()
-			elif config.plugins.infopanel_redpanel.selection.value == '4':
-				self.StartsoftcamPanel()
-			else:
-				self.StartPlugin(config.plugins.infopanel_redpanel.selection.value)
-
-		except:
-			print "Error on RedKeyTask !!"
-		
-	def softcamPanel(self):
-		try:
-			if config.plugins.infopanel_redpanel.selectionLong.value =='0':
-				self.instantRecord()
-			elif config.plugins.infopanel_redpanel.selectionLong.value =='1':
-				from Plugins.Extensions.Infopanel.plugin import Infopanel
-				self.session.open(Infopanel, services = self.servicelist)
-			elif config.plugins.infopanel_redpanel.selectionLong.value == '2':
-				self.session.open(TimerEditList)
-			elif config.plugins.infopanel_redpanel.selectionLong.value == '3':
-				self.showMovies()
-			elif config.plugins.infopanel_redpanel.selectionLong.value == '4':
-				self.StartsoftcamPanel()
-			else:
-				self.StartPlugin(config.plugins.infopanel_redpanel.selectionLong.value)
-
-		except:
-			print "Error on RedKeyTask Long!!"
-			
-	def StartsoftcamPanel(self):
-		try:
-			from Plugins.Extensions.Infopanel.SoftcamPanel import SoftcamPanel
-			self.session.open(SoftcamPanel)
-		except:
-			pass
-
-	def StartPlugin(self, name):
-		pluginlist = plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)
-		for p in pluginlist:
-			if p.name == name:
-				p(session=self.session)
-				break
-
-class InfoBarQuickMenu:
-	def __init__(self):
-		self["QuickMenuActions"] = HelpableActionMap(self, "InfoBarQuickMenu",
-				{
-					"quickmenu": (self.bluekey_qm, _("Quick Menu...")),
-				})
-
-	def bluekey_qm(self):
-		if config.workaround.blueswitch.value == "1":
-			self.showExtensionSelection()
-		else:
-			self.quickmenuStart()			
-
-	def quickmenuStart(self):
-		try:
-			if not self.session.pipshown:
-				from Plugins.Extensions.Infopanel.QuickMenu import QuickMenu
-				self.session.open(QuickMenu)
-			else:
-				self.showExtensionSelection()
-		except:
-			print "[INFOBARGENERICS] QuickMenu: error pipshow, starting Quick Menu"
-			from Plugins.Extensions.Infopanel.QuickMenu import QuickMenu
-			self.session.open(QuickMenu)
-
 class InfoBarInstantRecord:
 	"""Instant Record - handles the instantRecord action in order to
 	start/stop instant records"""
@@ -4087,41 +3920,7 @@ class InfoBarAudioSelection:
 				"yellow_key": (self.yellow_key, _("Audio options...")),
 				"audioSelectionLong": (self.audioDownmixToggle, _("Toggle Digital downmix...")),
 			})
-
-	def yellow_key(self):
-		if not hasattr(self, "LongButtonPressed"):
-			self.LongButtonPressed = False
-		if not self.LongButtonPressed:
-			if config.plugins.infopanel_yellowkey.list.value == '0':
-				from Screens.AudioSelection import AudioSelection
-				self.session.openWithCallback(self.audioSelected, AudioSelection, infobar=self)
-			elif config.plugins.infopanel_yellowkey.list.value == '2':
-				global AUDIO
-				AUDIO = True
-				ToggleVideo()
-			elif config.plugins.infopanel_yellowkey.list.value == '3':
-				self.startTeletext()
-			else:
-				try:
-					self.startTimeshift()
-				except:
-					pass
-		else:
-			if config.plugins.infopanel_yellowkey.listLong.value == '0':
-				from Screens.AudioSelection import AudioSelection
-				self.session.openWithCallback(self.audioSelected, AudioSelection, infobar=self)
-			elif config.plugins.infopanel_yellowkey.listLong.value == '2':
-				global AUDIO
-				AUDIO = True
-				ToggleVideo()
-			elif config.plugins.infopanel_yellowkey.listLong.value == '3':
-				self.startTeletext()
-			else:
-				try:
-					self.startTimeshift()
-				except:
-					pass
-				
+			
 	def audioSelection(self):
 		from Screens.AudioSelection import AudioSelection
 		self.session.openWithCallback(self.audioSelected, AudioSelection, infobar=self)
@@ -4172,6 +3971,16 @@ class InfoBarSubserviceSelection:
 		self.onClose.append(self.__removeNotifications)
 
 		self.bouquets = self.bsel = self.selectedSubservice = None
+
+	def GreenPressed(self):	
+		          service = self.session.nav.getCurrentService()	
+	            subservices = service and service.subServices()	
+	        	if not subservices or subservices.getNumberOfSubservices() == 0:	
+			                try:	
+			                          	from Screens.BpGreen import DeliteGreenPanel	
+			                        	self.session.open(DeliteGreenPanel)	
+			               except:	
+				                        pass
 
 	def __removeNotifications(self):
 		self.session.nav.event.remove(self.checkSubservicesAvail)
@@ -4269,36 +4078,7 @@ class InfoBarSubserviceSelection:
 		if self.bsel:
 			self.bsel.close(True)
 			self.bouquets = self.bsel = self.selectedSubservice = None
-
-	def GreenPressed(self):
-		if config.plisettings.Subservice.value == "0":
-			self.openTimerList()
-		elif config.plisettings.Subservice.value == "1":
-			self.openPluginBrowser()
-		else:
-			serviceRef = self.session.nav.getCurrentlyPlayingServiceReference()
-			if serviceRef:
-				subservices = getActiveSubservicesForCurrentChannel(serviceRef.toString())
-				if subservices and len(subservices) > 1 and serviceRef.toString() in [x[1] for x in subservices]:
-					self.subserviceSelection()
-				else:
-					if config.plisettings.Subservice.value == "2":
-						self.openTimerList()
-					else:
-						self.openPluginBrowser()
-			else:
-				if config.plisettings.Subservice.value == "2":
-					self.openTimerList()
-				else:
-					self.openPluginBrowser()
-
-	def openPluginBrowser(self):
-		try:
-			from Screens.PluginBrowser import PluginBrowser
-			self.session.open(PluginBrowser)
-		except:
-			pass
-
+    
 	def openTimerList(self):
 		self.session.open(TimerEditList)
 
@@ -4974,16 +4754,6 @@ class InfoBarSubtitleSupport(object):
 		service = self.session.nav.getCurrentService()
 		info = service and service.info()
 		config.subtitles.dvb_subtitles_centered.value = info and info.getInfo(iServiceInformation.sCenterDVBSubs) and True
-
-	def subtitleQuickMenu(self):
-		service = self.session.nav.getCurrentService()
-		subtitle = service and service.subtitle()
-		subtitlelist = subtitle and subtitle.getSubtitleList()
-		if self.selected_subtitle and self.selected_subtitle != (0,0,0,0):
-			from Screens.AudioSelection import QuickSubtitlesConfigMenu
-			self.session.open(QuickSubtitlesConfigMenu, self)
-		else:
-			self.subtitleSelection()
 
 	def __serviceChanged(self):
 		if self.selected_subtitle:
