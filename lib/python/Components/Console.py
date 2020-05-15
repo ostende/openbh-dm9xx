@@ -1,4 +1,5 @@
-import enigma, os
+import enigma, ctypes, os
+
 
 class ConsoleItem:
 	def __init__(self, containers, cmd, callback, extra_args):
@@ -24,13 +25,10 @@ class ConsoleItem:
 		if retval:
 			self.finishedCB(retval)
 		if callback is None:
-			pid = self.container.getPID()
-			print "[Console] pid = %s" %pid
 			try:
-				os.waitpid(pid, 0)
-			except OSError:
+				os.waitpid(self.container.getPID(), 0)
+			except:
 				pass
-
 	def dataAvailCB(self, data):
 		self.appResults.append(data)
 	def finishedCB(self, retval):
@@ -38,7 +36,7 @@ class ConsoleItem:
 		del self.containers[self.name]
 		del self.container.dataAvail[:]
 		del self.container.appClosed[:]
-		del self.container
+		self.container = None
 		callback = self.callback
 		if callback is not None:
 			data = ''.join(self.appResults)
@@ -46,11 +44,13 @@ class ConsoleItem:
 
 class Console(object):
 	def __init__(self):
-		# Still called appContainers because Network.py accesses it to
+		# Still called appContainers and appResults because Network.py accesses it to
 		# know if there's still stuff running
 		self.appContainers = {}
+		self.appResults = {}
 
-	def ePopen(self, cmd, callback=None, extra_args=[]):
+	def ePopen(self, cmd, callback=None, extra_args=None):
+		extra_args = [] if extra_args is None else extra_args
 		print "[Console] command:", cmd
 		return ConsoleItem(self.appContainers, cmd, callback, extra_args)
 

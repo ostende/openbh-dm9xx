@@ -103,7 +103,7 @@ class Screen(dict, GUISkin):
 		self.active_components = []
 		for val in active_components:
 			val.execEnd()
-#		assert self.session != None, "execEnd on non-execing screen!"
+#		assert self.session is not None, "execEnd on non-execing screen!"
 #		self.session = None
 		self.execing = False
 		for x in self.onExecEnd:
@@ -146,6 +146,8 @@ class Screen(dict, GUISkin):
 		self.instance.setFocus(o.instance)
 
 	def show(self):
+		# Temporarily add to ease up identification of screens
+		print '[SCREENNAME] ',self.skinName
 		if (self.shown and self.already_shown) or not self.instance:
 			return
 		self.shown = True
@@ -184,7 +186,7 @@ class Screen(dict, GUISkin):
 			return self.global_screen
 		else:
 			return None
-
+			
 	def callLater(self, function):
 		self.__callLaterTimer = eTimer()
 		self.__callLaterTimer.callback.append(function)
