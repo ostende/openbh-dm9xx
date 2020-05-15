@@ -26,8 +26,6 @@ def InitUsageConfig():
 	config.misc.useNTPminutes = ConfigSelection(default = "30", choices = [("30", "30" + " " +_("minutes")), ("60", _("Hour")), ("1440", _("Once per day"))])
 	config.misc.remotecontrol_text_support = ConfigYesNo(default = True)
 
-	config.workaround = ConfigSubsection()
-	config.workaround.blueswitch = ConfigSelection(default = "0", choices = [("0", _("QuickMenu/Extensions")), ("1", _("Extensions/QuickMenu"))])
 	config.workaround.deeprecord = ConfigYesNo(default = False)
 	config.workaround.wakeuptime = ConfigSelectionNumber(default = 5, stepwidth = 1, min = 0, max = 30, wraparound = True)
 	config.workaround.wakeupwindow = ConfigSelectionNumber(default = 5, stepwidth = 5, min = 5, max = 60, wraparound = True)
@@ -125,7 +123,7 @@ def InitUsageConfig():
 	config.usage.showpicon = ConfigYesNo(default = True)
 	
 #########  Workaround for VTI Skins   ##############
-	config.usage.picon_dir = ConfigDirectory(default = "/usr/share/enigma2/picon")
+	config.usage.picon_dir = ConfigDirectory(default = "/media/hdd/picon")
 	config.usage.movielist_show_picon = ConfigYesNo(default = False)
 	config.usage.use_extended_pig = ConfigYesNo(default = False)
 	config.usage.use_extended_pig_channelselection = ConfigYesNo(default = False)
@@ -1136,7 +1134,7 @@ def InitUsageConfig():
 
 	crashlogheader = _("We are really sorry. Your receiver encountered " \
 					 "a software problem, and needs to be restarted.\n" \
-					 "Please send the logfile %senigma2_crash_xxxxxx.log to www.opena.tv.\n" \
+					 "Please send the logfile %senigma2_crash_xxxxxx.log to www.startimes.com.\n" \
 					 "Your receiver restarts in 10 seconds!\n" \
 					 "Component: enigma2") % config.crash.debug_path.value
 	config.crash.debug_text = ConfigText(default=crashlogheader, fixed_size=False)
