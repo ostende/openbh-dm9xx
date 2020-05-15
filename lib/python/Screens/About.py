@@ -325,9 +325,9 @@ class About(Screen):
 
 			self["FullAbout"] = ScrollLabel(my_txt)
 		else:
-			self["lab1"] = StaticText(_("openATV"))
-			self["lab2"] = StaticText(_("By openATV Image Team"))
-			self["lab3"] = StaticText(_("Support at") + " www.opena.tv")
+			self["lab1"] = StaticText(_("OpenBlackHole"))
+			self["lab2"] = StaticText(_("By Ostende"))
+			self["lab3"] = StaticText(_("Support at") + " www.tunisia-sat.com")
 			model = None
 			AboutText = getAboutText()[0]
 			self["AboutScrollLabel"] = ScrollLabel(AboutText)
@@ -885,7 +885,7 @@ class ViewGitLog(Screen):
 		fd = open('/etc/' + self.logtype + '-git.log', 'r')
 		releasenotes = fd.read()
 		fd.close()
-		releasenotes = releasenotes.replace('\nopenatv: build', "\n\nopenatv: build")
+		releasenotes = releasenotes.replace('\nopenblackhole: build', "\n\nopenblackhole: build")
 		self["text"].setText(releasenotes)
 		summarytext = releasenotes
 		try:
